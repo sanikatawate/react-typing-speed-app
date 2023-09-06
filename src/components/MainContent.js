@@ -1,96 +1,104 @@
-import React from 'react'
-import { Link, useNavigate } from "react-router-dom"
+import React, { useState} from 'react'
 import "./Main.css" 
-import { faker } from "@faker-js/faker"; // To Generate Paragraph
-import refresh from "../assets/images/refresh.jpeg" //Refresh Icon
-import { useState, createContext } from "react"
+import { faker } from "@faker-js/faker"; 
+import refresh from "../assets/images/refresh.jpeg"
 import MyTimer from './Timer'
-import Word from './Word';
-import Letter from './Letter'
+import Result from './Result';
 
-const timeLeft = 30;
-const wordcount = 30;
-const randomwords = faker.random.words(wordcount).toLowerCase();
+// const para = faker.word.words(100).toLowerCase()
+let time
+
+
+function Word(props) {
+  return(
+      <span className={props.style}>
+        {props.word.split('').map((item, key)=>{
+          let style
+
+          if(props.letterDic){
+            // console.log(props.letterDic)
+            if(props.letterDic[key]){
+              // console.log(props.letterDic[key].style)
+              style = props.letterDic[key].style
+              return(<Letter letter={item} key={key} index={key} style={style}/>)
+            }
+          }
+            return(<Letter letter={item} key={key} index={key}/>)
+          })}
+      </span>
+
+  )
+}
+
+function Letter(props) {
+  return(
+      <span className={props.style}>{props.letter}</span>
+  )
+}
 
 function MainContent() {
 
-  const [state, setState] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [status, setStatus] = useState('inactive')
-  const [redcount, setRedcount] = useState(0)
-  const [whitecount, setWhitecount] = useState(0)
-  const [wordcount, setWordcount] = useState(0)
+    const [para, setPara] = useState(faker.word.words(100).toLowerCase())
+    const [state, setState] = useState(false)
+    const [activeWordIndex, setActiveWordIndex] = useState(0)
+    const [activeLetterIndex, setActiveLetterIndex] = useState(0)
+    const [letterDic, setLetterDic] = useState([])
 
-  const time = new Date();
-  time.setSeconds(time.getSeconds()+30); // 10 minutes timer
-
-  // const generate=()=>{
-  //   setMainPara(faker.word.words(lengthpara).toLowerCase())
-  //   setMainDict(mainpara.split(' '))
-  //   setState(false)
-  // }
-  //   if(i){
-  //     for(var i=0; i<400; i++)
-  //   {
-  //     document.getElementById(`${i}`).style.color ='#848887';
-  //   }
-  //   }
-  // }
-
-  const dict =[]
-  randomwords.split('').forEach(item => {
-    dict.push({letter: item, check:0})
-  });
-  console.log(dict)
-
-  const [words, setWords] = useState(dict)
-
-  const handler = (event) => {
-    
-    if(index===0)
-      setStatus(true)
-    let check;
-    if (words[index].letter === event.nativeEvent.key) 
-    {
-      check = 1;
-      setWhitecount(whitecount+1) 
-
-      if(event.nativeEvent.key===' '){
-        check = 0;
-        setWordcount(wordcount+1)}
+    const onRefresh=()=>{
+      setState(false)
+      setPara(faker.word.words(100).toLowerCase())
+      setLetterDic([])
+      setActiveLetterIndex(0)
+      setActiveWordIndex(0)
     }
-    else
-    {
-      check = -1;
-      setRedcount(redcount+1)
+
+    const handler = (e)=>{
+      setState(true)
+      time = new Date()
+      time.setSeconds(time.getSeconds()+30); // 10 minutes timer
+      console.log(e.nativeEvent.key, para.split(' ')[activeWordIndex][activeLetterIndex])
+
+      if(e.nativeEvent.key===para.split(' ')[activeWordIndex][activeLetterIndex]){
+        setActiveLetterIndex((prev)=>prev+1)
+        setLetterDic([...letterDic, {index: activeLetterIndex, style:'correct'}])
+      }
+      else{
+        setActiveLetterIndex((prev)=>prev+1)
+        setLetterDic([...letterDic, {index: activeLetterIndex, style:'incorrect'}])
+      }
+
+      if(e.nativeEvent.key===" "){
+        setActiveWordIndex((prev)=>prev+1)
+        setActiveLetterIndex(0)
+        setLetterDic([])
+      }
     }
-    const duplicatearr = [...words]
-    duplicatearr[index].check = check
-    setWords(duplicatearr)
-    setIndex(index + 1);
-  };
 
   return (
-    <div className='main-content'>
+    <>
+      <div className='main-content'>
+        <div>
+          {state && <MyTimer expiryTimestamp={time}/>}
+        </div>
+        <div className='para'>
+          {para.split(' ').map((item, key)=>{
+            if(activeWordIndex===key){
+              return(<Word word={item} key={key} index={key} style="word active" letterDic={letterDic}/>)
+            }
+            else{
+              return(<Word word={item} key={key} index={key} style='word'/>)
+            }
+
+          })}
+        </div>
+      </div>
       <div>
-        {state && <MyTimer expiryTimestamp={time}/>}
+        <button className='refresh'><img alt='' src={refresh} onClick={onRefresh} width="50px" height="50px"/></button>
+        <input type='text' onKeyPress={(e) => handler(e)} autoFocus onBlur={({ target }) => {target.focus()} } />
       </div>
-      <div className='para' id='para'>
-          {/* { mainDict.map((word, index)=>{
-            return(<Word word={word} key={index} letter={word.letter} check={word.check}/>)
-          })} */}
-          {words.map((word, index) => {
-          return <Letter key={index} letter={word.letter} check={word.check}></Letter>;
-        })}
-      </div>
-      <button className='refresh'><img alt='' src={refresh} width="50px" height="50px"/></button>
-      <input id='text' type="text" onKeyPress={(e) => {handler(e); setState(true)}} autoFocus onBlur={({ target }) => {target.focus();console.log(target)} } />
-    </div>
+      
+    </>
   )
 }
 
 export default MainContent
-
- {/* {word_arr.map((word, index)=>{
-            return(<div className='word'>{word.split('').map(letter=><Letter letter={letter}/>)}</div>)
-          })} */}
