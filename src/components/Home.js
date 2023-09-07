@@ -1,13 +1,15 @@
-import React from 'react'
-import Navbar from './Navbar';
+import React, { useState } from 'react'
 import MainContent from './MainContent';
-import Footer from './Footer';
+import Hero from './Hero';
 
 function Home() {
+  const [wordlimit, setWordLimit] = useState(50)
+  const [timelimit, setTimeLimit] = useState(30)
   return (
     <>
         <div>
-            <MainContent />
+            <Hero setWordLimit={setWordLimit} setTimeLimit={setTimeLimit} />
+            <MainContent wl={wordlimit} tl={timelimit} />
         </div>
     </>
   )

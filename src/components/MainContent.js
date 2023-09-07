@@ -13,17 +13,10 @@ function Word(props) {
   return(
       <span className={props.style}>
         {props.word.split('').map((item, key)=>{
-          let style
-
-          if(props.letterDic){
-            // console.log(props.letterDic)
-            if(props.letterDic[key]){
-              // console.log(props.letterDic[key].style)
-              style = props.letterDic[key].style
-              return(<Letter letter={item} key={key} index={key} style={style}/>)
-            }
+          if(props.letterDic && props.letterDic[key]){ 
+              return(<Letter letter={item} key={key} index={key} style={props.letterDic[key].style}/>)
           }
-            return(<Letter letter={item} key={key} index={key}/>)
+          return(<Letter letter={item} key={key} index={key}/>)
           })}
       </span>
 
@@ -36,9 +29,10 @@ function Letter(props) {
   )
 }
 
-function MainContent() {
+function MainContent(props) {
 
-    const [para, setPara] = useState(faker.word.words(100).toLowerCase())
+  console.log(100, props.tl)
+    const [para, setPara] = useState(faker.word.words(100).toLowerCase().split(' '))
     const [state, setState] = useState(false)
     const [activeWordIndex, setActiveWordIndex] = useState(0)
     const [activeLetterIndex, setActiveLetterIndex] = useState(0)
@@ -46,7 +40,7 @@ function MainContent() {
 
     const onRefresh=()=>{
       setState(false)
-      setPara(faker.word.words(100).toLowerCase())
+      setPara(faker.word.words(100).toLowerCase().split(' '))
       setLetterDic([])
       setActiveLetterIndex(0)
       setActiveWordIndex(0)
@@ -55,10 +49,10 @@ function MainContent() {
     const handler = (e)=>{
       setState(true)
       time = new Date()
-      time.setSeconds(time.getSeconds()+30); // 10 minutes timer
-      console.log(e.nativeEvent.key, para.split(' ')[activeWordIndex][activeLetterIndex])
+      time.setSeconds(time.getSeconds()+props.tl); 
+      console.log(e.nativeEvent.key, para[activeWordIndex][activeLetterIndex])
 
-      if(e.nativeEvent.key===para.split(' ')[activeWordIndex][activeLetterIndex]){
+      if(e.nativeEvent.key===para[activeWordIndex][activeLetterIndex]){
         setActiveLetterIndex((prev)=>prev+1)
         setLetterDic([...letterDic, {index: activeLetterIndex, style:'correct'}])
       }
@@ -72,30 +66,41 @@ function MainContent() {
         setActiveLetterIndex(0)
         setLetterDic([])
       }
+
+      // if(activeLetterIndex > para[activeWordIndex].length){
+      //   para[activeWordIndex] = para[activeWordIndex] + (e.nativeEvent.key)
+      //   setPara((prev)=>{
+      //     return(prev.map((item, key)=>{
+      //       return(item===para[activeWordIndex]?item+e.nativeEvent.key:item)
+      //     }))
+      //   })
+      // }
     }
+
+    
 
   return (
     <>
       <div className='main-content'>
-        <div>
-          {state && <MyTimer expiryTimestamp={time}/>}
+         <div style={{height:'40px'}}>
+         {state &&<MyTimer expiryTimestamp={time}/>}
         </div>
         <div className='para'>
-          {para.split(' ').map((item, key)=>{
+          {para.slice(0, props.wl).map((item, key)=>{
             if(activeWordIndex===key){
-              return(<Word word={item} key={key} index={key} style="word active" letterDic={letterDic}/>)
+              return(<Word word={item} key={key} index={key} style="word active" active={true} letterDic={letterDic}/>)
             }
             else{
               return(<Word word={item} key={key} index={key} style='word'/>)
             }
-
           })}
         </div>
       </div>
       <div>
         <button className='refresh'><img alt='' src={refresh} onClick={onRefresh} width="50px" height="50px"/></button>
-        <input type='text' onKeyPress={(e) => handler(e)} autoFocus onBlur={({ target }) => {target.focus()} } />
+        <input style={{opacity:'0'}} type='text' onKeyPress={(e) => handler(e)} autoFocus onBlur={({ target }) => {target.focus()} } />
       </div>
+      <p>WPM: {activeWordIndex*60/props.tl}</p>
       
     </>
   )
