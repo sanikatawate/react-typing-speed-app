@@ -1,10 +1,12 @@
 import './App.css';
-import Pages from './components/Pages';
+import Backup from './components/Backup';
+import Pages from './components/Pages'
 
 function App() {
   return (
     <div className="App">
       <Pages />
+      {/* <Backup /> */}
     </div>
   );
 }
