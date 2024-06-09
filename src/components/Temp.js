@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 
 const LetterContext = createContext()
 
-const cloud = 'this is my kingdom'
+const cloud = 'some randm random random para'
 
 function Word(props) {
   return(
@@ -22,7 +22,7 @@ function Word(props) {
             return(<Letter letter={item} key={key} index={key} style={style}/>)
           })}
       </span>
-      
+
   )
 }
 
@@ -59,7 +59,7 @@ function Temp() {
 
   return (
     <>
-        <div>
+        <div className='para'>
           {cloud.split(' ').map((item, key)=>{
             if(activeWordIndex===key){
               return(<Word word={item} key={key} index={key} style="word active" letterDic={letterDic}/>)
@@ -67,10 +67,10 @@ function Temp() {
             else{
               return(<Word word={item} key={key} index={key} style='word'/>)
             }
-            
+
           })}
         </div>
-      
+
       <div><input type='text' onKeyPress={(e) => handler(e)} autoFocus onBlur={({ target }) => {target.focus()} } /></div>
     </>
   )

@@ -1,6 +1,6 @@
-import './App.css';
 import Backup from './components/Backup';
 import Pages from './components/Pages'
+import "./App.css"
 
 function App() {
   return (

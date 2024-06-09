@@ -1,0 +1,66 @@
+import React, { useState } from 'react'
+import "./Main.css" 
+import { faker } from "@faker-js/faker"; // To Generate Paragraph
+
+const cloud = 'this is my kingdom'
+const dict = []
+cloud.split(' ').map((item) =>{
+  const temp = []
+  item.split('').map((childitem)=> temp.push({letter:childitem, style:'letter'}))
+  return(dict.push(temp))
+});
+
+function Word(props) {
+  return(
+      <span className={props.style}>
+        <Letter dic={props.dic}/>
+      </span>
+      
+  )
+}
+
+function Letter(props) {
+  return(
+      <span>{props.dic[0].letter[0]}</span>
+  )
+}
+
+function Temp() {
+
+    const [activeWordIndex, setActiveWordIndex] = useState(0)
+    const [activeLetterIndex, setActiveLetterIndex] = useState(0)
+    const [letterInfo, setletterInfo] = useState(dict)
+    const [count, setCount] = useState(0)
+
+    const handler = (e)=>{
+      if(e.nativeEvent.key===" "){
+        setActiveWordIndex(activeWordIndex+1)
+      }
+      if(e.nativeEvent.key===dict[activeLetterIndex].letter){
+        dict[activeLetterIndex].style = 'letter correct'
+        setActiveLetterIndex(activeLetterIndex+1)
+      }
+      else{
+        dict[activeLetterIndex].style = 'letter incorrect'
+        setActiveLetterIndex(activeLetterIndex+1)
+      }
+      setletterInfo({ ...dict })
+      console.log(e.nativeEvent.key, dict[activeLetterIndex].letter)
+    }
+
+  return (
+    <>
+        <div>
+          {letterInfo.map((item, key)=>{
+            return(<Word dic={item} key={key} style={activeWordIndex===key?"word active":"word"}/>)
+          })}
+        </div>
+      
+      <div><input type='text' onKeyPress={(e) => handler(e)} autoFocus onBlur={({ target }) => {target.focus()} } /></div>
+    </>
+  )
+}
+
+export default Temp
+
+//letter={props.letterInfo.letter} style={props.letterInfo.style}
